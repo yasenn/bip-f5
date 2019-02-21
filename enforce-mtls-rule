@@ -1,0 +1,42 @@
+# Below iRule enforces MTLS on a ViP if the exact end-point is matched to a list of set end-points contained in the associated 
+# data group. As such, a valid client cert must be passed as part of the call. For all others, plain/default TLS only is enforced 
+# 
+# Requires corresponding Data Group (www.domainname-path-data-group) with a list of entries/end-points which you wish to enforce MTLS on
+#
+# ltm rule www.domainname-rule {
+#    when CLIENTSSL_CLIENTCERT {
+#  if { [SSL::cert count] < 1 } {
+#        log local0. "no cert, rejecting [IP::client_addr]"
+#        reject
+#  } else {
+#        log local0. "subject: [X509::subject [SSL::cert 0]]\nissuer [X509::issuer [SSL::cert 0]]"
+#        set subject [X509::subject [SSL::cert 0]]
+#  }
+#
+# }
+# when HTTP_REQUEST {
+#      if { [SSL::cert count] <= 0 } {
+#        if { [class match [string tolower [HTTP::uri]] starts_with www.domainname-path-data-group ]  } {
+#                      SSL::authenticate always
+#                      SSL::cert mode require
+#                      SSL::renegotiate
+#        }
+#      } else {
+#          log local0. "[IP::client_addr] [HTTP::uri] $subject"
+#      }
+# }
+# }
+
+
+# Corresponding Data Group (www.domainname-path-data-group)
+#
+# ltm data-group internal www.domainname-path-data-group {
+#    records {
+#        /context1/api { }
+#        /context2 { }
+#        /context3/api/int { }
+#        /context4/int { }
+#    }
+#    type string
+#}
+
