@@ -1,0 +1,44 @@
+# Basic rule to lock down a particular end-point "/context/InternallyAccessible*" in this case to a set list of 
+# known IP addresses (Internal/corp network for example).
+#
+# ltm rule lockDownAccess-rule {
+#    when HTTP_REQUEST {
+#        if { [HTTP::header exists "X-Teros-Client-IP"] } {
+#            set ip [string trim [HTTP::header "X-Teros-Client-IP"]]
+#        } else {
+#            set ip [IP::client_addr]
+#        }
+#        log local0. "[HTTP::uri] $ip"
+#
+#         switch -glob [HTTP::uri] {
+#           "/context/InternallyAccessible*" {
+#             if { not ( [class match $ip equals whitelist-int-network] ) } {
+#                    log local0. "$ip is not in the list"
+#                    discard
+#                }
+#                #SSL::disable serverside
+#                pool internalApp-http-pool
+#            }
+#            "*" { 
+#                pool defaultApp-http-pool
+#            }
+#         }
+#   }
+# }
+
+
+# ltm data-group internal whitelist-int-network {
+#    records {
+#        10.10.1.0/24 {
+#            data 1
+#        }
+#        1.2.3.0/27 {
+#            data 1
+#        }
+#        2.3.4.0/28 {
+#            data 1
+#        }
+#    }
+#    type ip
+#}
+
