@@ -1,0 +1,24 @@
+# Configure a ViP with a specific port to act as a transparent outbound proxy for apps/servers running behind it. 
+# Ensure "explicit-proxy-tcp-profile" & "explicit-proxy-http-profile" are added under ViP config and then attach below
+# iRule to set a list of allowed source addresses (i.e. a server in 10.10.0.0/24 is allowed to call this outbound proxy, 
+# but not one in 10.10.3.0/24)
+
+# ltm rule explicit-proxy-allowed-rule {
+#    when CLIENT_ACCEPTED {
+#       if { not ( [class match [IP::client_addr] equals explicit-proxy-allowed-ips-group] ) }{
+#             discard
+#        }
+# }
+# }
+
+# Corresponding data group example:
+# ltm data-group internal explicit-proxy-allowed-ips-group {
+#    records {
+#        10.10.0.0/24 { }
+#        10.10.1.0/24 { }
+#        10.10.2.0/24 { }
+#        127.0.0.1/32 { }
+#    }
+#    type ip
+# }
+
