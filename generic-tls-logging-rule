@@ -1,0 +1,19 @@
+# Apply on terminating SSL ViP(s) and you should be able to capture various SSL details for later logging/analysis via Syslog/Splunk etc.
+# 
+# Feb 21 06:04:18 bip0abc0 info tmm3[25848]: Rule /Common/generic-tls-logging-rule <HTTP_REQUEST>: <174> 1.144.109.237 TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256 host.example.com /page/page1
+# Feb 21 06:04:18 bip0abc0 info tmm5[25848]: Rule /Common/generic-tls-logging-rule <HTTP_REQUEST>: <174> 54.215.18.46 TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256 host.example1.com /context1/api/payout?max=1
+# Feb 21 06:04:18 bip0abc0 info tmm3[25848]: Rule /Common/generic-tls-logging-rule <HTTP_REQUEST>: <174> 54.215.18.46 TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256 host.example2.com /context/api/payment?max=1
+# Feb 21 06:04:18 bip0abc0 info tmm[25848]:  Rule /Common/generic-tls-logging-rule <HTTP_REQUEST>: <174> 54.215.18.46 TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256 host1.example.com /context2/login/auth
+# Feb 21 06:04:18 bip0abc0 info tmm5[25848]: Rule /Common/generic-tls-logging-rule <HTTP_REQUEST>: <174> 10.149.36.41 TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256 host2.example1.com /context/api/getStuff
+# Feb 21 06:04:18 bip0abc0 info tmm1[25848]: Rule /Common/generic-tls-logging-rule <HTTP_REQUEST>: <174> 54.215.18.46 TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256 host.example3.com /context2/login/merchantLogin
+# Feb 21 06:04:18 bip0abc0 info tmm4[25848]: Rule /Common/generic-tls-logging-rule <HTTP_REQUEST>: <174> 10.149.36.40 TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256 host.example6.com /context3/api/getMoreStuff
+
+# generic-tls-logging-rule
+when CLIENT_ACCEPTED {
+   set hsl [HSL::open -proto TCP -pool generic-logging-pool]
+}
+when HTTP_REQUEST {
+        set logmessage "<174> [IP::client_addr] [SSL::cipher version] [SSL::cipher name] [SSL::cipher bits] [HTTP::host] [HTTP::uri]\n"
+        HSL::send $hsl $logmessage
+        log local0. $logmessage
+}
