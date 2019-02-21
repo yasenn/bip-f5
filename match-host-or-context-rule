@@ -1,0 +1,39 @@
+# Basic rule to handle a wildcard cert domain *.pilot.example.com. Rule can be used to match on host [HTTP::host]
+# or context [HTTP::uri] and matched accordingly to corresponding pool
+#
+# when HTTP_REQUEST {
+#   switch -glob [HTTP::host] {
+#     a.pilot.example.com {
+#        switch -glob [HTTP::uri] {
+#            "/app1*" {
+#                pool app1-https-pool
+#            }
+#            "/app2*" {
+#                pool app2-https-pool
+#            }
+#            "/*" {
+#                pool defaultApp-https-pool
+#            }
+#        }
+#     }
+#     b.pilot.example.com {
+#       pool app3-https-pool
+#     }
+#     c.pilot.example.com {
+#        switch -glob [HTTP::uri] {
+#            "/app4*" {
+#                SSL::disable serversid
+#                pool app4-https-tcp-pool
+#            }
+#            "/*" {
+#                SSL::disable serversid
+#                pool defaultApp-https-pool
+#                #log local0. "DefaultApp [HTTP::host] [HTTP::uri]"
+#            }
+#        }
+#     }
+#     default {
+#      HTTP::respond 301 noserver Location  "https://www.example.com"
+#     }
+#   }
+# }
