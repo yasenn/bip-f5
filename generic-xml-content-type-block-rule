@@ -1,0 +1,20 @@
+# Generic context blocking rule (Block xml in this case) which can be applied to any external facing ViP
+#
+# ltm rule generic-xml-content-type-block-rule {
+#    when HTTP_REQUEST {
+#          if { [string tolower [HTTP::header "Content-type"]] contains "xml" }  {
+#                log local0. "Found [HTTP::header "Content-type"] responding with 500 [IP::client_addr]"
+#                HTTP::respond 500 content {
+#                      <html>
+#                         <head>
+#                            <title>Error</title>
+#                         </head>
+#                         <body>
+#                            Illegal request - No XML accepted in header!
+#                         </body>
+#                      </html>
+#                }
+#                return
+#        }
+#   }
+# }
